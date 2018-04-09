@@ -12,6 +12,7 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -36,8 +37,12 @@ public class MainActivity extends AppCompatActivity {
         jsonFeedObservable = Observable.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(ObservableEmitter<String> emitter) throws Exception {
-                String result = feedDataFromUrl("http://codemobiles.com/adhoc/feed/youtube_feed.php?type=json");            }
-        });
+                String result = feedDataFromUrl("http://codemobiles.com/adhoc/feed/youtube_feed.php?type=json");
+                emitter.onNext(result);
+                emitter.onComplete();
+            }
+
+        }).subscribeOn(Schedulers.newThread());
 
         // xml Observable
         xmlFeedObservable =Observable.create(new ObservableOnSubscribe<String>() {
@@ -51,6 +56,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickZip(View v){
+
+        jsonFeedObservable.subscribe(new Consumer<String>() {
+            @Override
+            public void accept(String s) throws Exception {
+
+                
+            }
+        });
 
     }
 
