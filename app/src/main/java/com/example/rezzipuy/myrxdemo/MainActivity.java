@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickConcat(View v){
 
-       Disposable concatObservable = Observable.concat(jsonFeedObservable, xmlFeedObservable)
+       Disposable concatObservable = Observable.concat(xmlFeedObservable, jsonFeedObservable)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<String>() {
