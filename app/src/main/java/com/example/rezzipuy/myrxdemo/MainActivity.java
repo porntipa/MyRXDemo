@@ -82,6 +82,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickConcat(View v){
 
+       Disposable concatObservable = Observable.concat(jsonFeedObservable, xmlFeedObservable)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        mTextview.setText(s);
+                    }
+                });
+
     }
 
     public void onClickMerge(View v){
