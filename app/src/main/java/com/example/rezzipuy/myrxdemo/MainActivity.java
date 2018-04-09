@@ -50,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
         xmlFeedObservable =Observable.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(ObservableEmitter<String> emitter) throws Exception {
-
+                String result = feedDataFromUrl("http://codemobiles.com/adhoc/feed/youtube_feed.php?type=xml");
+                emitter.onNext(result);
+                emitter.onComplete();
 
             }
         });
@@ -58,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickZip(View v){
+        mTextview.setText("");
+        mDescTextView.setText("This allows developer to mix the output of all observables and return in a single object. This makes you see content of xml and json in textview below");
+
         Observable<String> zipObservable = Observable.zip(jsonFeedObservable, xmlFeedObservable, new BiFunction<String, String, String>() {
             @Override
             public String apply(String jsonResult, String xmlResult) throws Exception {
@@ -66,9 +71,7 @@ public class MainActivity extends AppCompatActivity {
         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
 
 
-        zipObservable.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
+        zipObservable.subscribe(new Consumer<String>() {
                     @Override
                     public void accept(String s) throws Exception {
                         mTextview.setText(s);
