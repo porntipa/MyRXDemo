@@ -11,7 +11,9 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
@@ -56,16 +58,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickZip(View v){
-
-        jsonFeedObservable.subscribe(new Consumer<String>() {
+        Observable<String> zipObservable = Observable.zip(jsonFeedObservable, xmlFeedObservable, new BiFunction<String, String, String>() {
             @Override
-            public void accept(String s) throws Exception {
-
-                
+            public String apply(String jsonResult, String xmlResult) throws Exception {
+                return jsonResult + xmlResult;
             }
-        });
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
 
-    }
+
+        zipObservable.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        mTextview.setText(s);
+                    }
+                });
+}
+
 
     public void onClickConcat(View v){
 
