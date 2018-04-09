@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -95,6 +96,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickMerge(View v){
+        mTextview.setText("");
+        mDescTextView.setText("This causes the json to show first because the xml is delayed to 5 sec. (first come, first show, you can switch delay between json and xml)");
+
+        //
+        // This tries to simulate way to grab fastest data.
+        subscription = Observable.merge(xmlFeedObservable.delay(5, TimeUnit.SECONDS), jsonFeedObservable)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        mTextview.setText(s);
+                        subscription.dispose();
+                    }
+                });
 
     }
 
